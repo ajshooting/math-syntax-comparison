@@ -4,13 +4,15 @@ import path from 'path';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import remark2rehype from 'remark-rehype';
+import rehypeKatex from 'rehype-katex';
+import rehypeStringify from 'rehype-stringify';
 import { visit } from 'unist-util-visit';
-import { remark } from 'remark';
-import remarkStringify from 'remark-stringify'; 
 
 // --- 
 const README_PATH = path.resolve('./README.md');
-const OUTPUT_MD_PATH = path.resolve('./src/components/GeneratedTable.md');
+const OUTPUT_COMPONENT_PATH = path.resolve('./src/components/GeneratedTable.astro');
 const TARGET_HEADING = 'table';
 // ---
 
@@ -22,14 +24,18 @@ async function extractAndSaveTable() {
     } catch (err) {
         console.error(`Error reading README.md: ${err.message}`);
         // READMEが見つからない場合は空のファイルを作成してビルドエラーを防ぐ
-        console.log(`Creating empty file at ${OUTPUT_MD_PATH}`);
-        await fs.mkdir(path.dirname(OUTPUT_MD_PATH), { recursive: true });
-        await fs.writeFile(OUTPUT_MD_PATH, '', 'utf-8');
+        console.log(`Creating empty component at ${OUTPUT_COMPONENT_PATH}`);
+        const emptyContent = `---\nconst tableHtml = \`<p>Table not found</p>\`;\n---\n<div set:html={tableHtml} />`;
+        await fs.mkdir(path.dirname(OUTPUT_COMPONENT_PATH), { recursive: true });
+        await fs.writeFile(OUTPUT_COMPONENT_PATH, emptyContent, 'utf-8');
         return;
     }
 
-    const processor = unified().use(remarkParse).use(remarkGfm);
-    const tree = processor.parse(readmeContent);
+    // parse README into MDAST with GFM tables and math nodes
+    const processor = unified().use(remarkParse).use(remarkGfm).use(remarkMath);
+    // parse then run to apply remark-gfm (table parsing)
+    const parsed = processor.parse(readmeContent);
+    const tree = await processor.run(parsed);
 
     let tableNode = null;
     let foundHeading = false;
@@ -54,23 +60,32 @@ async function extractAndSaveTable() {
     });
 
     if (tableNode) {
-        // テーブルノードをMarkdown文字列に変換
-        // remark-stringify を使って、見つかったテーブルノードだけを含む新しいASTを文字列化する
-        const tableMarkdown = remark()
-            .use(remarkGfm) // GFMサポート（特にテーブル用）
-            .use(remarkStringify, { listItemIndent: 'one' }) // テーブルの整形のため
-            .stringify({ type: 'root', children: [tableNode] }); // テーブルノードだけを持つルートノードを作成
+        // 直接 MDAST を HAST に変換 (remark-gfm と remark-math により生成された tableNode)
+        const root = { type: 'root', children: [tableNode] };
+        const hast = await unified()
+            .use(remark2rehype)
+            .use(rehypeKatex, { displayMode: true })
+            .run(root);
+        // HAST を HTML にシリアライズ
+        const html = unified()
+            .use(rehypeStringify)
+            .stringify(hast);
+        console.log('Generated HTML:\n', html);
 
-        console.log(`Writing extracted table to: ${OUTPUT_MD_PATH}`);
-        await fs.mkdir(path.dirname(OUTPUT_MD_PATH), { recursive: true });
-        await fs.writeFile(OUTPUT_MD_PATH, tableMarkdown, 'utf-8');
-        console.log('Table extraction successful.');
+        // Astroコンポーネントとして出力
+        console.log(`Writing generated component to: ${OUTPUT_COMPONENT_PATH}`);
+        // Astroコンポーネントの内容を定義
+        const componentContent = `---\nconst tableHtml = \`${html}\`;\n---\n<div set:html={tableHtml} />`;
+        await fs.mkdir(path.dirname(OUTPUT_COMPONENT_PATH), { recursive: true });
+        await fs.writeFile(OUTPUT_COMPONENT_PATH, componentContent, 'utf-8');
+        console.log('Component generation successful.');
     } else {
         console.warn(`Warning: Could not find a table after heading "${TARGET_HEADING}" in ${README_PATH}.`);
-        // テーブルが見つからない場合も空ファイルを作成
-        console.log(`Creating empty file at ${OUTPUT_MD_PATH}`);
-        await fs.mkdir(path.dirname(OUTPUT_MD_PATH), { recursive: true });
-        await fs.writeFile(OUTPUT_MD_PATH, '*(Table not found in README.md)*', 'utf-8');
+        // 見つからない場合は空のコンポーネントを作成
+        const emptyContent = `---\nconst tableHtml = \`<p>Table not found</p>\`;\n---\n<div set:html={tableHtml} />`;
+        console.log(`Creating empty component at ${OUTPUT_COMPONENT_PATH}`);
+        await fs.mkdir(path.dirname(OUTPUT_COMPONENT_PATH), { recursive: true });
+        await fs.writeFile(OUTPUT_COMPONENT_PATH, emptyContent, 'utf-8');
     }
 }
 
