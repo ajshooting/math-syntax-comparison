@@ -1,13 +1,34 @@
 # Math Syntax Comparison Across Software
 
 
-
 ## table
 
-| Operation  | Mathematica | SageMath | Maxima | Scilab | GNU Octave | Maple |
-| --- | --- | --- | --- | --- | --- | --- |
-| $\int x^2 \, dx$ | `Integrate[x^2, x]` | `integrate(x^2, x)` | `integrate(x^2, x)` | Not built-in (symbolic) | `int(sym('x^2'), x)` (symbolic package) | `int(x^2, x)` |
-| $\int_0^1 x^2 \, dx$ | `Integrate[x^2, {x, 0, 1}]` | `integrate(x^2, (x, 0, 1))` | `integrate(x^2, x, 0, 1)` | `integrate('x^2', 'x', 0, 1)` (numerical) | `int(sym('x^2'), [0, 1])` | `int(x^2, 0..1)` |
-| Solve $x + 2 = 3$ for $x$ | `Solve[x + 2 == 3, x]` | `solve(x + 2 == 3, x)` | `solve(x + 2 = 3, x)` | Not built-in (symbolic) | `solve(sym('x + 2 = 3'), x)` | `solve(x + 2 = 3, x)` |
-| Solve $x^2 - 4 = 0$ for $x$ | `Solve[x^2 - 4 == 0, x]` | `solve(x^2 - 4 == 0, x)` | `solve(x^2 - 4 = 0, x)` | `roots([1, 0, -4])` (numerical) | `solve(sym('x^2 - 4 = 0'), x)` | `solve(x^2 - 4 = 0, x)` |
-| $\frac{d}{dx} x^2$ | `D[x^2, x]` | `diff(x^2, x)` | `diff(x^2, x)` | Not built-in (symbolic) | `diff(sym('x^2'), x)` | `diff(x^2, x)` |
+| Operation                | Mathematica                  | Maxima                          | sympy                      | SageMath                    | Scilab                              | GNU Octave                     | Maple                       |
+| ------------------------ | ---------------------------- | ------------------------------- | -------------------------- | --------------------------- | ----------------------------------- | ------------------------------ | --------------------------- |
+| + - × ÷                  | +, -, *, /                   | +, -, *, /                      | +, -, *, /                 | +, -, *, /                  | +, -, *, /                          | +, -, *, /                     | +, -, *, /                  |
+| $2^3 , 4!$               | 2^3, 4!                      | 2^3, 4!                         | 2**3, factorial(4)         | 2**3, factorial(4)          | 2^3, factorial(4)                   | 2^3, factorial(4)              | 2^3, 4!                     |
+| $e$ $\pi$                | E, Pi                        | %e, %pi                         | E, pi                      | e, pi                       | %e, %pi                             | exp(1), pi                     | exp(1), Pi                  |
+| $\sum_{i=1}^n i$         | `Sum[i, {i, 1, n}]`          | sum(i, i, 1, n)                 | Sum(i, (i, 1, n))          | sum(i, i, 1, n)             | –                                   | symsum(i, i, 1, n)             | sum(i, i=1..n)              |
+| $\int x^2 \, dx$         | Integrate[x^2, x]            | integrate(x^2, x)               | integrate(x**2, x)         | integrate(x^2, x)           | –                                   | int(sym('x^2'), x)             | int(x^2, x)                 |
+| $\int_0^1 x^2 \, dx$     | Integrate[x^2, {x, 0, 1}]    | integrate(x^2, x, 0, 1)         | integrate(x**2, (x, 0, 1)) | integrate(x^2, (x, 0, 1))   | integrate('x^2', 'x', 0, 1)         | int(sym('x^2'), [0, 1])        | int(x^2, x=0..1)            |
+| $x + 2 = 3$ for $x$      | Solve[x + 2 == 3, x]         | solve(x + 2 = 3, x)             | solve(Eq(x + 2, 3), x)     | solve(x + 2 == 3, x)        | –                                   | solve(sym('x + 2 = 3'), x)     | solve(x + 2 = 3, x)         |
+| $x^2 - 4 = 0$ for $x$    | Solve[x^2 - 4 == 0, x]       | solve(x^2 - 4 = 0, x)           | solve(x**2 - 4, x)         | solve(x^2 - 4 == 0, x)      | roots([1, 0, -4])                   | solve(sym('x^2 - 4 = 0'), x)   | solve(x^2 - 4 = 0, x)       |
+| $\frac{d}{dx} x^2$       | D[x^2, x]                    | diff(x^2, x)                    | diff(x**2, x)              | diff(x^2, x)                | –                                   | diff(sym('x^2'), x)            | diff(x^2, x)                |
+|                          |                              |                                 |                            |                             |                                     |                                |                             |
+| $\int x^2 \, dx$         | `Integrate[x^2, x]`          | `integrate(x^2, x)`             |                            | `integrate(x^2, x)`         | –                                   | `int(sym('x^2'), x)` (package) | `int(x^2, x)`               |
+| $\int_0^1 x^2 \, dx$     | `Integrate[x^2, {x, 0, 1}]`  | `integrate(x^2, x, 0, 1)`       |                            | `integrate(x^2, (x, 0, 1))` | `integrate('x^2', 'x', 0, 1)`       | `int(sym('x^2'), [0, 1])`      | `int(x^2, 0..1)`            |
+| $x + 2 = 3$ for $x$      | `Solve[x + 2 == 3, x]`       | `solve(x + 2 = 3, x)`           |                            | `solve(x + 2 == 3, x)`      | –                                   | `solve(sym('x + 2 = 3'), x)`   | `solve(x + 2 = 3, x)`       |
+| $x^2 - 4 = 0$ for $x$    | `Solve[x^2 - 4 == 0, x]`     | `solve(x^2 - 4 = 0, x)`         |                            | `solve(x^2 - 4 == 0, x)`    | `roots([1, 0, -4])`                 | `solve(sym('x^2 - 4 = 0'), x)` | `solve(x^2 - 4 = 0, x)`     |
+| $\frac{d}{dx} x^2$       | `D[x^2, x]`                  | `diff(x^2, x)`                  |                            | `diff(x^2, x)`              | –                                   | `diff(sym('x^2'), x)`          | `diff(x^2, x)`              |
+|                          |                              |                                 |                            |                             |                                     |                                |                             |
+| Define matrix            | m = {{a,b},{c,d}}            | m = matrix([a,b],[c,d])         | Matrix([[a,b],[c,d]])      | matrix([[a,b],[c,d]])       | [a,b; c,d]                          | [a,b; c,d]                     | <<a\|b>\|<c\|d>>            |
+| Matrix multiplication    | m1.m2                        | m1 . m2                         | m1 * m2                    | m1 * m2                     | m1 * m2                             | m1 * m2                        | m1 . m2                     |
+| Determinant              | Det[m]                       | determinant(m)                  | m.det()                    | m.det()                     | det(m)                              | det(m)                         | Determinant(m)              |
+| Inverse                  | Inverse[m]                   | invert(m)                       | m.inv()                    | m.inverse()                 | inv(m)                              | inv(m)                         | MatrixInverse(m)            |
+|                          |                              |                                 |                            |                             |                                     |                                |                             |
+| Plot y = sin(x)          | `Plot[Sin[x], {x, 0, 2*Pi}]` | `plot2d(sin(x), [x, 0, 2*%pi])` |                            |                             | `x = 0:0.01:2*%pi; plot(x, sin(x))` | `fplot(@sin, [0, 2*pi])`       | `plot(sin(x), x = 0..2*Pi)` |
+| Limit (x→0)              | `Limit[Sin[x]/x, x -> 0]`    | `limit(sin(x)/x, x, 0)`         |                            |                             | –                                   | `limit(sin(x)/x, x, 0)`        | `limit(sin(x)/x, x = 0)`    |
+| Polynomial expansion     | `Expand[(x + 1)^3]`          | `expand((x + 1)^3)`             |                            |                             | –                                   | `expand((x + 1)^3)`            | `expand((x + 1)^3)`         |
+| Polynomial factorization | `Factor[x^2 - 4]`            | `factor(x^2 - 4)`               |                            |                             | –                                   | `factor(x^2 - 4)`              | `factor(x^2 - 4)`           |
+|                          |                              |                                 |                            |                             |                                     |                                |                             |
+
