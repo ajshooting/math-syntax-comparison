@@ -16,7 +16,7 @@ import GeneratedTable from '../components/GeneratedTable.astro';
             <GeneratedTable />
         </div>
 
-        <style>
+        <style is:global>
             .table-container {
                 overflow-x: auto;
                 margin-top: 2em;
@@ -26,11 +26,11 @@ import GeneratedTable from '../components/GeneratedTable.astro';
             }
 
             .table-container table {
-                width: 100%;
+                width: auto;
+                min-width: max-content;
                 border-collapse: collapse;
                 margin-bottom: 1em;
                 font-size: 0.9em;
-                border: 1px solid #000000;
             }
 
             .table-container th,
@@ -39,28 +39,25 @@ import GeneratedTable from '../components/GeneratedTable.astro';
                 padding: 8px 12px;
                 text-align: left;
                 vertical-align: top;
-                white-space: nowrap; /* すべてのセルで折り返しを禁止 */
+                white-space: nowrap;
             }
 
             .table-container th {
-                background-color: #888888;
+                background-color: #ffffff;
                 font-weight: bold;
             }
 
             .table-container td code,
             .table-container td pre {
-                white-space: nowrap;
                 padding: 0.1em 0.4em;
                 border-radius: 3px;
                 font-size: 0.95em;
-                display: inline-block;
-                max-width: 100%;
-                overflow-x: auto;
             }
             .table-container td pre {
                 display: block;
                 padding: 0.5em;
                 margin: 0;
+                white-space: pre;
             }
 
             .table-container .katex {
