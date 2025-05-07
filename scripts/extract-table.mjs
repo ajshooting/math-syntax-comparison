@@ -25,7 +25,10 @@ async function extractAndSaveTable() {
         console.error(`Error reading README.md: ${err.message}`);
         // READMEが見つからない場合は空のファイルを作成してビルドエラーを防ぐ
         console.log(`Creating empty component at ${OUTPUT_COMPONENT_PATH}`);
-        const emptyContent = `---\nconst tableHtml = \`<p>Table not found</p>\`;\n---\n<div set:html={tableHtml} />`;
+        const emptyContent = `---
+// This file is auto-generated. Do not edit directly.
+---
+<p>Table not found in README.md</p>`;
         await fs.mkdir(path.dirname(OUTPUT_COMPONENT_PATH), { recursive: true });
         await fs.writeFile(OUTPUT_COMPONENT_PATH, emptyContent, 'utf-8');
         return;
@@ -67,22 +70,32 @@ async function extractAndSaveTable() {
             .use(rehypeKatex, { displayMode: true })
             .run(root);
         // HAST を HTML にシリアライズ
-        const html = unified()
+        let html = unified()
             .use(rehypeStringify)
             .stringify(hast);
-        console.log('Generated HTML:\n', html);
+
+        // Astroが中括弧を式として解釈するのを防ぐためにHTMLエンティティに置換
+        html = html.replace(/{/g, '&lbrace;').replace(/}/g, '&rbrace;');
+
+        console.log('Generated HTML (curly braces escaped):\n', html);
 
         // Astroコンポーネントとして出力
         console.log(`Writing generated component to: ${OUTPUT_COMPONENT_PATH}`);
         // Astroコンポーネントの内容を定義
-        const componentContent = `---\nconst tableHtml = \`${html}\`;\n---\n<div set:html={tableHtml} />`;
+        const componentContent = `---
+// This file is auto-generated. Do not edit directly.
+---
+${html}`;
         await fs.mkdir(path.dirname(OUTPUT_COMPONENT_PATH), { recursive: true });
         await fs.writeFile(OUTPUT_COMPONENT_PATH, componentContent, 'utf-8');
         console.log('Component generation successful.');
     } else {
         console.warn(`Warning: Could not find a table after heading "${TARGET_HEADING}" in ${README_PATH}.`);
         // 見つからない場合は空のコンポーネントを作成
-        const emptyContent = `---\nconst tableHtml = \`<p>Table not found</p>\`;\n---\n<div set:html={tableHtml} />`;
+        const emptyContent = `---
+// This file is auto-generated. Do not edit directly.
+---
+<p>Table not found after heading "${TARGET_HEADING}" in README.md</p>`;
         console.log(`Creating empty component at ${OUTPUT_COMPONENT_PATH}`);
         await fs.mkdir(path.dirname(OUTPUT_COMPONENT_PATH), { recursive: true });
         await fs.writeFile(OUTPUT_COMPONENT_PATH, emptyContent, 'utf-8');
