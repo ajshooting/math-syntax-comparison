@@ -35,6 +35,7 @@
 | $\lim_{n \to \infty} \sin x$ | `Limit[Sin[x], x -> Infinity]` | `limit(sin(x), x, inf)`         | `limit(sin(x), x, oo)`       | `limit(sin(x), x=infinity)`  | –                             | `limit(sin(x), x, Inf)`        | `limit(sin(x), x=infinity)` |
 | Polynomial expansion         | `Expand[(x + 1)^3]`            | `expand((x + 1)^3)`             | `expand((x + 1)**3)`         | `expand((x + 1)^3)`          | –                             | `expand((x + 1)^3)`            | `expand((x + 1)^3)`         |
 | Polynomial factorization     | `Factor[x^2 - 4]`              | `factor(x^2 - 4)`               | `factor(x^2 - 4)`            | `factor(x^2 - 4)`            | –                             | `factor(x^2 - 4)`              | `factor(x^2 - 4)`           |
-
+|                              |                                |                                 |                              |                              |                               |                                |                             |
+| $y' = f(x,y)$ (常微分方程式)        | `DSolve[y'[x]==f[x,y[x]], y[x], x]` | `ode2(diff(y,x)=f(x,y), y, x)`         | `dsolve(Eq(y(x).diff(x),f(x,y(x))), y(x))` | `desolve(diff(y,x) == f(x,y), y, ivar=x)` | `ode(y0,t0,t,f)` (数値解)                  | `dsolve("Dy=f(x,y)", "y(x0)=y0")`     | `dsolve(diff(y(x),x)=f(x,y(x)), y(x))` |
 
 [https://hyperpolyglot.org/computer-algebra](https://hyperpolyglot.org/computer-algebra)
